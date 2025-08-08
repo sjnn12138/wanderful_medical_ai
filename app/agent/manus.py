@@ -13,6 +13,7 @@ from app.tool.browser_use_tool import BrowserUseTool
 from app.tool.mcp import MCPClients, MCPClientTool
 from app.tool.python_execute import PythonExecute
 from app.tool.str_replace_editor import StrReplaceEditor
+from app.tool.excel_to_sqlite import ExcelToSQLiteTool
 
 
 class Manus(ToolCallAgent):
@@ -37,6 +38,7 @@ class Manus(ToolCallAgent):
             BrowserUseTool(),
             StrReplaceEditor(),
             AskHuman(),
+            ExcelToSQLiteTool(),
             Terminate(),
         )
     )

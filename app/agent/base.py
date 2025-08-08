@@ -147,12 +147,27 @@ class BaseAgent(BaseModel, ABC):
                 results.append(f"Step {self.current_step}: {step_result}")
 
             if self.current_step >= self.max_steps:
-                self.current_step = 0
-                self.state = AgentState.IDLE
                 results.append(f"Terminated: Reached max steps ({self.max_steps})")
-        await SANDBOX_CLIENT.cleanup()
-        return "\n".join(results) if results else "No steps executed"
 
+        # Summarization logic
+        summary_prompt = "请根据以上的对话历史，总结整个过程，并用中文向用户汇报最终结果。请确保你的回答是直接的、清晰的，并且只包含最终的结论和成果，不要复述中间的步骤。"
+        
+        summary_messages = self.memory.messages + [Message.user_message(summary_prompt)]
+
+        try:
+            summary = await self.llm.ask(messages=summary_messages, stream=False)
+            final_result = summary
+            logger.info(f"Generated summary: {final_result}")
+        except Exception as e:
+            logger.error(f"Failed to generate summary: {e}")
+            final_result = f"任务已完成，但在生成最终总结时遇到错误。\nDetails: {e}"
+        
+        # Reset state for the next run
+        self.current_step = 0
+        self.state = AgentState.IDLE
+        
+        await SANDBOX_CLIENT.cleanup()
+        return final_result
     @abstractmethod
     async def step(self) -> str:
         """Execute a single step in the agent's workflow.

@@ -30,6 +30,16 @@ from app.schema import (
     ToolChoice,
 )
 
+def _handle_dict_encoding(d):
+    if isinstance(d, dict):
+        return {k: _handle_dict_encoding(v) for k, v in d.items()}
+    elif isinstance(d, list):
+        return [_handle_dict_encoding(i) for i in d]
+    elif isinstance(d, str):
+        return d.encode('utf-8', 'ignore').decode('utf-8')
+    else:
+        return d
+
 
 REASONING_MODELS = ["o1", "o3-mini"]
 MULTIMODAL_MODELS = [
@@ -405,7 +415,7 @@ class LLM:
 
             params = {
                 "model": self.model,
-                "messages": messages,
+                "messages": _handle_dict_encoding(messages),
             }
 
             if self.model in REASONING_MODELS:
@@ -713,8 +723,8 @@ class LLM:
             # Set up the completion request
             params = {
                 "model": self.model,
-                "messages": messages,
-                "tools": tools,
+                "messages": _handle_dict_encoding(messages),
+                "tools": _handle_dict_encoding(tools),
                 "tool_choice": tool_choice,
                 "timeout": timeout,
                 **kwargs,
