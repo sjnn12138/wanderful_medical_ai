@@ -14,8 +14,8 @@ from app.tool.mcp import MCPClients, MCPClientTool
 from app.tool.python_execute import PythonExecute
 from app.tool.str_replace_editor import StrReplaceEditor
 from app.tool.excel_to_sqlite import ExcelToSQLiteTool
-from app.tool.chroma_ingest import ChromaIngestTool
-from app.tool.chroma_query import ChromaQueryTool
+from app.tool.ingest_tool import IngestTool
+from app.tool.query_tool import QueryTool
 
 class Manus(ToolCallAgent):
     """A versatile general-purpose agent with support for both local and MCP tools."""
@@ -40,9 +40,9 @@ class Manus(ToolCallAgent):
             StrReplaceEditor(),
             AskHuman(),
             ExcelToSQLiteTool(),
+            IngestTool(),
+            QueryTool(),
             Terminate(),
-            ChromaIngestTool(),  # 添加ChromaDB存储工具
-            ChromaQueryTool(),    # 添加ChromaDB查询工具
         )
     )
 
