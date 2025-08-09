@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>调用我的牛牛API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            text-align: center;
+        }
+        input, button {
+            padding: 10px;
+            font-size: 16px;
+            margin: 10px;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>调试</h1>
+    <p>输入</p>
+
+    <input type="number" id="numberInput" placeholder="输入一个数字" />
+    <button onclick="callApi()">计算两倍</button>
+
+    <div id="result" class="result"></div>
+
+    <script>
+        // ✅ 替换成你当前的 ngrok 链接
+        const API_URL = "https://de5bebb19f3d.ngrok-free.app";
+
+        function callApi() {
+            const input = document.getElementById("numberInput").value;
+            const resultDiv = document.getElementById("result");
+
+            // 检查输入
+            if (!input || isNaN(input)) {
+                resultDiv.innerHTML = '<span class="error">请输入有效数字</span>';
+                return;
+            }
+
+            const number = parseFloat(input);
+
+            // 调用你的 Python API
+            fetch(API_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "ngrok-skip-browser-warning": "1"  // 跳过 ngrok 警告
+                },
+                body: JSON.stringify({
+                    data: number,
+                    meta: {
+                        source: "web-frontend",
+                        timestamp: new Date().toISOString()
+                    }
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP 错误! 状态码: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                resultDiv.innerHTML = `✅ 结果：${data.result}`;
+            })
+            .catch(error => {
+                console.error("请求失败:", error);
+                resultDiv.innerHTML = `<span class="error">错误：${error.message}</span>`;
+            });
+        }
+    </script>
+
+</body>
+</html>

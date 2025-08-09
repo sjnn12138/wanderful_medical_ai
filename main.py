@@ -1,5 +1,6 @@
 import argparse
 import asyncio
+import sys
 
 from app.agent.manus import Manus
 from app.logger import logger
@@ -34,3 +35,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
+# if __name__ == "__main__":
+#     print(f"Received prompt: {sys.argv}")
+#     print("Agent response: Hello from main.py")
