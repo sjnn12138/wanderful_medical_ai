@@ -1,6 +1,8 @@
 import asyncio
 import base64
 import json
+import sys
+import os
 from typing import Generic, Optional, TypeVar
 
 from browser_use import Browser as BrowserUseBrowser
@@ -10,6 +12,7 @@ from browser_use.dom.service import DomService
 from pydantic import Field, field_validator
 from pydantic_core.core_schema import ValidationInfo
 
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from app.config import config
 from app.llm import LLM
 from app.tool.base import BaseTool, ToolResult

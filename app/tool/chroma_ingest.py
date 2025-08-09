@@ -1,14 +1,15 @@
 import os
 import re
 import uuid
+import sys
 from typing import List, Optional
 
 import chromadb
 from chromadb.utils import embedding_functions
 from pydantic import BaseModel, Field
 
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from app.config import config
-from app.exceptions import ToolExecutionError
 from app.logger import logger
 from app.tool.base import BaseTool
 
@@ -66,7 +67,7 @@ class ChromaIngestTool(BaseTool):
 
 
     def _run(self, file_path: str, chunk_size: int = 200, collection_name: str = "default") -> str:
-        try:
+
             # 验证文件路径
             if not os.path.exists(file_path):
                 raise FileNotFoundError(f"文件不存在: {file_path}")
@@ -96,11 +97,8 @@ class ChromaIngestTool(BaseTool):
             logger.info(f"成功将 {len(chunks)} 个片段存入ChromaDB集合'{collection_name}'")
             return f"成功处理文件: {file_path}\n保存 {len(chunks)} 个片段到集合'{collection_name}'"
 
-        except Exception as e:
-            logger.error(f"文件处理失败: {str(e)}")
-            raise ToolExecutionError(f"文件处理失败: {str(e)}")
 
-    if __name__ == "__main__":
+if __name__ == "__main__":
         # 测试用例
         import tempfile
 
