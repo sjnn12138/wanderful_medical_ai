@@ -16,6 +16,8 @@ from app.tool.str_replace_editor import StrReplaceEditor
 from app.tool.excel_to_sqlite import ExcelToSQLiteTool
 from app.tool.ingest_tool import IngestTool
 from app.tool.query_tool import QueryTool
+from app.tool.text_to_sql_tool import TextToSQLTool
+from app.tool.generate_mschema_tool import GenerateMSchemaTool
 
 class Manus(ToolCallAgent):
     """A versatile general-purpose agent with support for both local and MCP tools."""
@@ -43,6 +45,8 @@ class Manus(ToolCallAgent):
             IngestTool(),
             QueryTool(),
             Terminate(),
+            TextToSQLTool(),
+            GenerateMSchemaTool()
         )
     )
 
