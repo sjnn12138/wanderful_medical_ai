@@ -1,4 +1,6 @@
 import os
+import json
+import time
 from typing import Optional
 
 import chromadb
@@ -9,6 +11,7 @@ CHUNK_SIZE = 200
 PERSIST_DIR = "./chroma_db"
 COLLECTION_NAME = "documents"
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"
+SUMMARY_FILE = os.path.join(PERSIST_DIR, "knowledge_base_summary.json")  # Knowledge base summary file
 
 
 def chunk_text(text, chunk_size):
@@ -65,6 +68,29 @@ class IngestTool(BaseTool):
                 ids=ids,
                 documents=chunks
             )
-            return ToolResult(output=f"Successfully ingested {len(chunks)} chunks from {file_path}")
+            
+            # Create or update knowledge base summary
+            summary = {}
+            if os.path.exists(SUMMARY_FILE):
+                try:
+                    with open(SUMMARY_FILE, 'r', encoding='utf-8') as f:
+                        summary = json.load(f)
+                except:
+                    pass
+            
+            # Add/update document entry in summary
+            summary[os.path.basename(file_path)] = {
+                "file_path": file_path,
+                "chunk_count": len(chunks),
+                "first_chunk": chunks[0] if chunks else "",
+                "last_updated": time.time(),
+                "size_bytes": os.path.getsize(file_path)
+            }
+            
+            # Save updated summary
+            with open(SUMMARY_FILE, 'w', encoding='utf-8') as f:
+                json.dump(summary, f, ensure_ascii=False, indent=2)
+                
+            return ToolResult(output=f"Successfully ingested {len(chunks)} chunks from {file_path} and updated knowledge base summary")
         except Exception as e:
             return ToolResult(error=f"Error ingesting documents: {e}")

@@ -216,20 +216,65 @@ class StrReplaceEditor(BaseTool):
             return await self._view_file(path, operator, view_range)
 
     @staticmethod
-    async def _view_directory(path: PathLike, operator: FileOperator) -> CLIResult:
-        """Display directory contents."""
-        find_cmd = f"find {path} -maxdepth 2 -not -path '*/\\.*'"
+    # async def _view_directory(path: PathLike, operator: FileOperator) -> CLIResult:
+    #     """Display directory contents."""
+    #     find_cmd = f"find {path} -maxdepth 2 -not -path '*/\\.*'"
+    #
+    #     # Execute command using the operator
+    #     returncode, stdout, stderr = await operator.run_command(find_cmd)
+    #
+    #     if not stderr:
+    #         stdout = (
+    #             f"Here's the files and directories up to 2 levels deep in {path}, "
+    #             f"excluding hidden items:\n{stdout}\n"
+    #         )
+    #
+    #     return CLIResult(output=stdout, error=stderr)
+    async def _view_directory(self, path: PathLike, operator: FileOperator) -> CLIResult:
+        """Display directory contents using os.walk (cross-platform)."""
+        import os
+        from pathlib import Path
 
-        # Execute command using the operator
-        returncode, stdout, stderr = await operator.run_command(find_cmd)
 
-        if not stderr:
-            stdout = (
+        path_obj = Path(path)
+        results = []
+
+            # 添加根目录
+        results.append(str(path_obj))
+
+            # 遍历目录（最多2层深度）
+        for root, dirs, files in os.walk(path_obj):
+                # 计算当前深度
+            current_depth = len(Path(root).relative_to(path_obj).parts)
+
+                # 限制深度为2层
+            if current_depth >= 2:
+                del dirs[
+                        :]  # 不再遍历更深目录
+                continue
+
+                    # 过滤隐藏文件和目录
+            dirs[:] = [d for d in dirs if not d.startswith('.')]
+            files = [f for f in files if not f.startswith('.')]
+
+                # 添加目录和文件
+            for name in dirs:
+                    results.append(str(Path(root) / name))
+            for name in files:
+                    results.append(str(Path(root) / name))
+
+            # 排序结果
+        results.sort()
+
+            # 生成输出
+        output = "\n".join(results)
+        message = (
                 f"Here's the files and directories up to 2 levels deep in {path}, "
-                f"excluding hidden items:\n{stdout}\n"
+                f"excluding hidden items:\n{output}"
             )
+        return CLIResult(output=message)
 
-        return CLIResult(output=stdout, error=stderr)
+
 
     async def _view_file(
         self,

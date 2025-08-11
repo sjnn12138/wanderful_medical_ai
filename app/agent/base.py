@@ -188,15 +188,24 @@ class BaseAgent(BaseModel, ABC):
             return False
 
         last_message = self.memory.messages[-1]
-        if not last_message.content:
+        # Handle both Message objects and dictionary-style messages
+        last_content = last_message.content if hasattr(last_message, 'content') else last_message.get("content", "")
+        if not last_content:
             return False
 
         # Count identical content occurrences
-        duplicate_count = sum(
-            1
-            for msg in reversed(self.memory.messages[:-1])
-            if msg.role == "assistant" and msg.content == last_message.content
-        )
+        duplicate_count = 0
+        for msg in reversed(self.memory.messages[:-1]):
+            # Skip messages without content
+            if hasattr(msg, 'content'):
+                content = msg.content
+                role = msg.role
+            else:  # Handle dictionary-style messages
+                content = msg.get("content", "")
+                role = msg.get("role", "")
+            
+            if role == "assistant" and content == last_content:
+                duplicate_count += 1
 
         return duplicate_count >= self.duplicate_threshold
 

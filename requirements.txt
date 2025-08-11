@@ -40,6 +40,8 @@ crawl4ai~=0.6.3
 
 huggingface-hub~=0.29.2
 setuptools~=75.8.0
+chromadb
+
 
 llama-index
 sqlalchemy
