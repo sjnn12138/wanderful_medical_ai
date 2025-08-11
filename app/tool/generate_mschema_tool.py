@@ -23,7 +23,7 @@ class GenerateMSchemaTool(BaseTool):
     )
     args_schema: Type[BaseModel] = GenerateMSchemaToolInput
 
-    async def execute(self, db_path: str = './data/2023-06科室绩效科室数据.sqlite', output_dir: str = './workspace') -> dict:
+    async def execute(self, db_path: str , output_dir: str) -> dict:
         """Generate M-Schema from SQLite database"""
         abs_path = os.path.abspath(db_path)
         if not os.path.exists(abs_path):

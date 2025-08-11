@@ -36,7 +36,7 @@ class TextToSQLTool(BaseTool):
                 return pd.DataFrame(result.fetchall(), columns=result.keys())
         return None
 
-    async def execute(self, question: str, db_path: str = './data/2023-06科室绩效科室数据.sqlite', mschema_path: str = './workspace/2023-06科室绩效科室数据.json',
+    async def execute(self, question: str, db_path: str = './workspace/2023-06科室绩效科室数据.sqlite', mschema_path: str = './workspace/2023-06科室绩效科室数据.json',
                    output_dir: str = './workspace', execute: bool = True) -> dict:
         """Convert natural language question to SQL and execute"""
         abs_db_path = os.path.abspath(db_path)
@@ -69,7 +69,7 @@ Wrap SQL in ```sql and ```.
 
         client = OpenAI(
             base_url='https://api-inference.modelscope.cn/v1',
-            api_key='ms-008c8429-3ace-4013-816d-dbfe2a252ea2',
+            api_key='ms-eb9b87d5-e78e-48cb-9de4-c5c6b1bdbb01',
         )
 
         try:

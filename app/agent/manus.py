@@ -41,7 +41,7 @@ class Manus(ToolCallAgent):
             PythonExecute(),
             BrowserUseTool(),
             # StrReplaceEditor(),
-            AskHuman(),
+            # AskHuman(),
             ExcelToSQLiteTool(),
             IngestTool(),
             QueryTool(),
