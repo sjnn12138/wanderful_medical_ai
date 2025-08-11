@@ -1,1 +1,0 @@
-This is a sample document about artificial intelligence in healthcare. It discusses how AI can help with medical diagnosis, patient monitoring, and drug discovery. The document also covers ethical considerations when using AI in medical applications.

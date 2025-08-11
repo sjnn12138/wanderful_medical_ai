@@ -16,6 +16,7 @@ from app.tool.str_replace_editor import StrReplaceEditor
 from app.tool.excel_to_sqlite import ExcelToSQLiteTool
 from app.tool.ingest_tool import IngestTool
 from app.tool.query_tool import QueryTool
+from app.tool.query_decomposer import QueryDecomposer  # 新增查询分解工具
 
 class Manus(ToolCallAgent):
     """A versatile general-purpose agent with support for both local and MCP tools."""
@@ -37,11 +38,12 @@ class Manus(ToolCallAgent):
         default_factory=lambda: ToolCollection(
             PythonExecute(),
             BrowserUseTool(),
-            StrReplaceEditor(),
+            # StrReplaceEditor(),
             AskHuman(),
             ExcelToSQLiteTool(),
             IngestTool(),
             QueryTool(),
+            # QueryDecomposer(),  # 新增查询分解工具
             Terminate(),
         )
     )
@@ -153,7 +155,8 @@ class Manus(ToolCallAgent):
         browser_in_use = any(
             tc.function.name == BrowserUseTool().name
             for msg in recent_messages
-            if msg.tool_calls
+            # 安全地处理消息对象，兼容字符串消息
+            if hasattr(msg, 'tool_calls') and msg.tool_calls
             for tc in msg.tool_calls
         )
 
