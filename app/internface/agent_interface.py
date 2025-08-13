@@ -18,9 +18,9 @@ def set_local_kb_mode(flag: int):
               return "1"
           return "0"
 
-async def execute_query(deep_mode: str, local_kb_mode:str, prompt: str):
+async def execute_query(model: int, prompt: str):
 
-          if deep_mode == "1" and local_kb_mode == "1":
+          if model != 0:
               # 执行本地查询
               from app.tool.query_tool import QueryTool
               query_tool = QueryTool()
@@ -81,7 +81,7 @@ async def execute_query(deep_mode: str, local_kb_mode:str, prompt: str):
               return db_response, combined_response
 
           # 简单模式
-          elif deep_mode == 0:
+          elif model == 0:
               from app.utils.deepseek import call_deepseek_api
               logger.warning("简单模式启用进行对话...")
               conversation_history = []
