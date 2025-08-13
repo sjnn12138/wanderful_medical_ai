@@ -75,7 +75,7 @@ Wrap SQL in ```sql and ```.
 
         client = OpenAI(
             base_url='https://api-inference.modelscope.cn/v1',
-            api_key='',
+            api_key='ms-eb9b87d5-e78e-48cb-9de4-c5c6b1bdbb01',
         )
 
         try:

@@ -433,6 +433,154 @@
             flex-direction: column;
         }
 
+        /* 知识库上传区域 */
+        .knowledge-container {
+            padding: 24px;
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            background: var(--content-bg);
+        }
+
+        .knowledge-header {
+            font-size: 24px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+        }
+
+        .knowledge-header i {
+            margin-right: 12px;
+            color: var(--primary);
+        }
+
+        .upload-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .upload-section {
+            background: var(--content-light);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: var(--transition);
+            border: 2px dashed rgba(255,255,255,0.1);
+        }
+
+        .upload-section:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+        }
+
+        .upload-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(16, 163, 127, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .upload-icon i {
+            font-size: 36px;
+            color: var(--primary);
+        }
+
+        .upload-title {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .upload-description {
+            color: var(--text-gray);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .upload-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .uploaded-files {
+            width: 100%;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .file-list {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .file-list th {
+            text-align: left;
+            padding: 10px 15px;
+            background: rgba(255,255,255,0.05);
+            color: var(--text-gray);
+        }
+
+        .file-list td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .file-action {
+            color: var(--primary);
+            cursor: pointer;
+        }
+
+        .submit-section {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .submit-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 40px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .submit-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
         /* 响应式调整 */
         @media (max-width: 1200px) {
             .left-container {
@@ -473,6 +621,10 @@
                 align-items: center;
                 justify-content: center;
                 cursor: pointer;
+            }
+
+            .upload-container {
+                flex-direction: column;
             }
         }
 
@@ -580,7 +732,7 @@
             </div>
         </div>
 
-        <div class="chat-container">
+        <div class="chat-container" id="chatPanel">
             <div class="chat-messages">
                 <div class="message ai-message">
                     <div class="message-header">
@@ -681,6 +833,75 @@
                 </div>
             </div>
         </div>
+
+        <!-- 知识库上传区域 -->
+        <div class="knowledge-container" id="knowledgePanel">
+            <div class="knowledge-header">
+                <i class="fas fa-book"></i> 新建本地知识库 - 运营科
+            </div>
+
+            <div class="upload-container">
+                <div class="upload-section">
+                    <div class="upload-icon">
+                        <i class="fas fa-table"></i>
+                    </div>
+                    <h3 class="upload-title">上传表格文件</h3>
+                    <p class="upload-description">上传Excel、CSV等表格文件，用于数据分析和报告生成</p>
+                    <input type="file" id="tableUpload" class="file-input" accept=".xlsx, .xls, .csv">
+                    <button class="upload-btn" onclick="document.getElementById('tableUpload').click()">
+                        <i class="fas fa-upload"></i> 选择表格文件
+                    </button>
+
+                    <div class="uploaded-files" id="tableFiles">
+                        <table class="file-list">
+                            <thead>
+                                <tr>
+                                    <th>文件名</th>
+                                    <th>大小</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableFilesList">
+                                <!-- 上传的文件将显示在这里 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="upload-section">
+                    <div class="upload-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h3 class="upload-title">上传文档文件</h3>
+                    <p class="upload-description">上传PDF、Word、TXT等文档，用于知识库建设</p>
+                    <input type="file" id="docUpload" class="file-input" accept=".pdf, .doc, .docx, .txt">
+                    <button class="upload-btn" onclick="document.getElementById('docUpload').click()">
+                        <i class="fas fa-upload"></i> 选择文档文件
+                    </button>
+
+                    <div class="uploaded-files" id="docFiles">
+                        <table class="file-list">
+                            <thead>
+                                <tr>
+                                    <th>文件名</th>
+                                    <th>大小</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="docFilesList">
+                                <!-- 上传的文件将显示在这里 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="submit-section">
+                <button class="submit-btn" id="processKnowledge">
+                    <i class="fas fa-cogs"></i> 处理并创建知识库
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -695,8 +916,16 @@
 
         // 功能导航切换
         const functionItems = document.querySelectorAll('.function-item');
-        const chatContainer = document.querySelector('.chat-container');
+        const chatPanel = document.getElementById('chatPanel');
         const analyticsPanel = document.getElementById('analyticsPanel');
+        const knowledgePanel = document.getElementById('knowledgePanel');
+
+        // 知识库上传相关元素
+        const tableUpload = document.getElementById('tableUpload');
+        const docUpload = document.getElementById('docUpload');
+        const tableFilesList = document.getElementById('tableFilesList');
+        const docFilesList = document.getElementById('docFilesList');
+        const processBtn = document.getElementById('processKnowledge');
 
         // 科室导航与功能栏切换
         function showFunctionSidebar() {
@@ -724,6 +953,10 @@
                 currentDepartment.innerHTML =
                     `<i class="fas fa-map-marker-alt"></i> 当前科室: ${deptName}`;
 
+                // 更新知识库标题
+                document.querySelector('.knowledge-header').innerHTML =
+                    `<i class="fas fa-book"></i> 新建本地知识库 - ${deptName}`;
+
                 // 显示功能栏
                 showFunctionSidebar();
             });
@@ -745,6 +978,8 @@
                     this.classList.add('active');
                     currentDepartment.innerHTML =
                         `<i class="fas fa-map-marker-alt"></i> 当前科室: ${newDept}`;
+                    document.querySelector('.knowledge-header').innerHTML =
+                        `<i class="fas fa-book"></i> 新建本地知识库 - ${newDept}`;
                     showFunctionSidebar();
                 });
             }
@@ -752,22 +987,97 @@
 
         // 功能导航切换
         functionItems.forEach(item => {
-            item.addEventListener('click', () => {
+            item.addEventListener('click', function() {
                 // 移除所有active类
                 functionItems.forEach(i => i.classList.remove('active'));
                 // 添加active到当前项
-                item.classList.add('active');
+                this.classList.add('active');
 
-                const target = item.getAttribute('data-target');
+                const target = this.getAttribute('data-target');
 
+                // 隐藏所有面板
+                chatPanel.style.display = 'none';
+                analyticsPanel.style.display = 'none';
+                knowledgePanel.style.display = 'none';
+
+                // 显示目标面板
                 if (target === 'analytics') {
-                    chatContainer.style.display = 'none';
                     analyticsPanel.style.display = 'flex';
+                } else if (target === 'knowledge') {
+                    knowledgePanel.style.display = 'flex';
                 } else {
-                    chatContainer.style.display = 'flex';
-                    analyticsPanel.style.display = 'none';
+                    chatPanel.style.display = 'flex';
                 }
             });
+        });
+
+        // 文件上传处理
+        tableUpload.addEventListener('change', function(e) {
+            handleFileUpload(e, 'tableFiles', tableFilesList);
+        });
+
+        docUpload.addEventListener('change', function(e) {
+            handleFileUpload(e, 'docFiles', docFilesList);
+        });
+
+        function handleFileUpload(event, containerId, fileListElement) {
+            const files = event.target.files;
+            if (files.length > 0) {
+                const container = document.getElementById(containerId);
+                container.style.display = 'block';
+
+                // 清空现有列表
+                fileListElement.innerHTML = '';
+
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const fileSize = formatFileSize(file.size);
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${file.name}</td>
+                        <td>${fileSize}</td>
+                        <td class="file-action" onclick="this.parentElement.remove()">
+                            <i class="fas fa-trash-alt"></i>
+                        </td>
+                    `;
+                    fileListElement.appendChild(row);
+                }
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // 处理知识库按钮
+        processBtn.addEventListener('click', function() {
+            const tableFiles = document.querySelectorAll('#tableFilesList tr');
+            const docFiles = document.querySelectorAll('#docFilesList tr');
+
+            if (tableFiles.length === 0 && docFiles.length === 0) {
+                alert('请至少上传一个文件！');
+                return;
+            }
+
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 处理中...';
+            this.disabled = true;
+
+            // 模拟处理过程
+            setTimeout(() => {
+                alert('知识库创建成功！系统已成功处理所有上传的文件。');
+                this.innerHTML = '<i class="fas fa-check"></i> 处理完成';
+
+                // 重置按钮状态
+                setTimeout(() => {
+                    this.innerHTML = '<i class="fas fa-cogs"></i> 处理并创建知识库';
+                    this.disabled = false;
+                }, 2000);
+            }, 3000);
         });
 
         // 发送消息功能
