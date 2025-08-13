@@ -1108,7 +1108,7 @@
         }
 
         // 处理知识库按钮
-        processBtn.addEventListener('click', function() {
+        processBtn.addEventListener('click', async function() {
             const tableFiles = document.querySelectorAll('#tableFilesList tr');
             const docFiles = document.querySelectorAll('#docFilesList tr');
 
@@ -1120,9 +1120,18 @@
             this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 处理中...';
             this.disabled = true;
 
-            // 模拟处理过程
-            setTimeout(() => {
-                alert('知识库创建成功！系统已成功处理所有上传的文件。');
+            try {
+                // 向后端发送知识库处理请求
+                const response = await fetch('http://localhost:5000/api/knowledge', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({})
+                });
+
+                const data = await response.json();
+                alert(data.message);
                 this.innerHTML = '<i class="fas fa-check"></i> 处理完成';
 
                 // 重置按钮状态
@@ -1130,7 +1139,29 @@
                     this.innerHTML = '<i class="fas fa-cogs"></i> 处理并创建知识库';
                     this.disabled = false;
                 }, 2000);
-            }, 3000);
+            } catch (error) {
+                console.error('请求失败:', error);
+                alert('知识库创建失败，请稍后再试');
+                this.innerHTML = '<i class="fas fa-cogs"></i> 处理并创建知识库';
+                this.disabled = false;
+            }
+        });
+
+        // 对话模式按钮切换
+        deepThinkingBtn.addEventListener('click', function() {
+            this.classList.toggle('active');
+            // 确保本地知识库按钮状态同步
+            if (localKnowledgeBtn.classList.contains('active')) {
+                localKnowledgeBtn.classList.remove('active');
+            }
+        });
+
+        localKnowledgeBtn.addEventListener('click', function() {
+            this.classList.toggle('active');
+            // 确保深度思考按钮状态同步
+            if (deepThinkingBtn.classList.contains('active')) {
+                deepThinkingBtn.classList.remove('active');
+            }
         });
 
         // 发送消息功能
@@ -1139,7 +1170,7 @@
             if (e.key === 'Enter') sendMessage();
         });
 
-        function sendMessage() {
+        async function sendMessage() {
             const input = document.getElementById('messageInput');
             const message = input.value.trim();
 
@@ -1162,80 +1193,77 @@
                 // 滚动到底部
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-                // 模拟AI回复
-                setTimeout(() => {
+                // 确定模式状态码
+                let mode = 0;
+                if (deepThinkingBtn.classList.contains('active') && !localKnowledgeBtn.classList.contains('active')) {
+                    mode = 1;
+                } else if (localKnowledgeBtn.classList.contains('active')) {
+                    mode = 2;
+                }
+
+                try {
+                    // 向后端发送请求
+                    const response = await fetch('http://localhost:5000/api/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            message: message,
+                            mode: mode
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    // 添加AI回复
                     const aiMessage = document.createElement('div');
                     aiMessage.className = 'message ai-message';
 
-                    // 根据当前模式生成不同回复
-                    let responseContent = '';
-                    if (deepThinkingBtn.classList.contains('active')) {
-                        responseContent = `
-                            <div class="message-content">
-                                <strong>【深度思考模式】</strong><br>
-                                收到您的指令: "${message}"。正在进行深入分析：
-                                <ol>
-                                    <li>正在分析问题背景和上下文关系</li>
-                                    <li>检索医院历史数据和相关案例</li>
-                                    <li>评估多种解决方案的可行性</li>
-                                    <li>考虑长期影响和潜在风险</li>
-                                </ol>
-                                预计需要30秒完成深度分析，请稍候...
-                            </div>
-                        `;
-                    } else if (localKnowledgeBtn.classList.contains('active')) {
-                        responseContent = `
-                            <div class="message-content">
-                                <strong>【本地知识库模式】</strong><br>
-                                收到您的指令: "${message}"。正在检索本地知识库：
-                                <ul>
-                                    <li>已匹配医院政策文件3份</li>
-                                    <li>找到相关运营报告2份</li>
-                                    <li>检索到类似案例5个</li>
-                                    <li>提取最佳实践方案</li>
-                                </ul>
-                                正在整合知识库内容生成回复...
-                            </div>
-                        `;
-                    } else {
-                        responseContent = `
-                            <div class="message-content">
-                                收到您的指令: "${message}"。正在分析相关数据，请稍候...
-                            </div>
-                        `;
+                    // 根据模式添加提示
+                    let modeIndicator = '';
+                    if (mode === 1) {
+                        modeIndicator = '<div style="font-size:12px; color: #10a37f; margin-bottom:5px;"><i class="fas fa-brain"></i> 深度思考模式</div>';
+                    } else if (mode === 2) {
+                        modeIndicator = '<div style="font-size:12px; color: #10a37f; margin-bottom:5px;"><i class="fas fa-book"></i> 本地知识库模式</div>';
                     }
 
                     aiMessage.innerHTML = `
                         <div class="message-header">
                             <i class="fas fa-robot"></i> 医院行政助手
                         </div>
-                        ${responseContent}
+                        <div class="message-content">
+                            ${modeIndicator}
+                            ${data.response}
+                        </div>
                     `;
 
                     messagesContainer.appendChild(aiMessage);
 
                     // 滚动到底部
                     messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                }, 1000);
+                } catch (error) {
+                    console.error('请求失败:', error);
+
+                    // 添加错误提示
+                    const aiMessage = document.createElement('div');
+                    aiMessage.className = 'message ai-message';
+                    aiMessage.innerHTML = `
+                        <div class="message-header">
+                            <i class="fas fa-robot"></i> 医院行政助手
+                        </div>
+                        <div class="message-content">
+                            抱歉，处理您的请求时遇到问题。请检查网络连接或稍后再试。
+                        </div>
+                    `;
+
+                    messagesContainer.appendChild(aiMessage);
+
+                    // 滚动到底部
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
             }
         }
-
-        // 对话模式按钮切换
-        deepThinkingBtn.addEventListener('click', function() {
-            this.classList.toggle('active');
-            // 确保本地知识库按钮状态同步
-            if (localKnowledgeBtn.classList.contains('active')) {
-                localKnowledgeBtn.classList.remove('active');
-            }
-        });
-
-        localKnowledgeBtn.addEventListener('click', function() {
-            this.classList.toggle('active');
-            // 确保深度思考按钮状态同步
-            if (deepThinkingBtn.classList.contains('active')) {
-                deepThinkingBtn.classList.remove('active');
-            }
-        });
 
         // 移动端菜单切换
         menuToggle.addEventListener('click', () => {
