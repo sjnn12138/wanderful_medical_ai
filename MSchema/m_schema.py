@@ -63,11 +63,13 @@ class MSchema:
         if table_comment is not None and table_comment != 'None' and len(table_comment) > 0:
             if self.schema is not None and len(self.schema) > 0:
                 output.append(f"# Table: {self.schema}.{table_name}, {table_comment}")
+                # output.append(f"# Table: {table_name}, {table_comment}")
             else:
                 output.append(f"# Table: {table_name}, {table_comment}")
         else:
             if self.schema is not None and len(self.schema) > 0:
                 output.append(f"# Table: {self.schema}.{table_name}")
+                # output.append(f"# Table: {table_name}")
             else:
                 output.append(f"# Table: {table_name}")
 

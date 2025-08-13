@@ -42,13 +42,13 @@ class Manus(ToolCallAgent):
             BrowserUseTool(),
             # StrReplaceEditor(),
             # AskHuman(),
-            ExcelToSQLiteTool(),
-            IngestTool(),
-            QueryTool(),
+            # ExcelToSQLiteTool(),
+            # IngestTool(),
+            # QueryTool(),
             # QueryDecomposer(),  # 新增查询分解工具
             Terminate(),
-            TextToSQLTool(),
-            GenerateMSchemaTool()
+            # TextToSQLTool(),
+            # GenerateMSchemaTool()
         )
     )
 

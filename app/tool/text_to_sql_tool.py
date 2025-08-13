@@ -28,13 +28,19 @@ class TextToSQLTool(BaseTool):
     args_schema: Type[BaseModel] = TextToSQLToolInput
 
     @staticmethod
-    def execute_sql(engine, sql: str):
-        """Execute SQL and return results"""
-        with engine.connect() as conn:
-            result = conn.execute(text(sql))
-            if result.returns_rows:
-                return pd.DataFrame(result.fetchall(), columns=result.keys())
-        return None
+    def execute_sql(engine, sql: str) -> str:
+        """Execute SQL and return results as string"""
+        try:
+            with engine.connect() as conn:
+                result = conn.execute(text(sql))
+                if result.returns_rows:
+                    # 将结果转换为字符串
+                    df = pd.DataFrame(result.fetchall(), columns=result.keys())
+                    return df.to_string(index=False)
+                else:
+                    return "Query executed successfully (no rows returned)"
+        except Exception as e:
+            return f"SQL execution error: {str(e)}"
 
     async def execute(self, question: str, db_path: str = './workspace/2023-06科室绩效科室数据.sqlite', mschema_path: str = './workspace/2023-06科室绩效科室数据.json',
                    output_dir: str = './workspace', execute: bool = True) -> dict:
@@ -83,23 +89,17 @@ Wrap SQL in ```sql and ```.
             )
 
             sql_content = response.choices[0].message.content
-            clean_sql = sql_content.replace('```sql', '').replace('```', '').replace(';', '').strip()
+            clean_sql = sql_content.replace('```sql', '').replace('```', '').replace(';', '').strip()+";"
 
-            os.makedirs(output_dir, exist_ok=True)
-            sql_file = os.path.join(output_dir, 'query_result.sql')
-            with open(sql_file, 'w', encoding='utf-8') as f:
-                f.write(clean_sql + ';')
-
-            result = {"status": "success", "sql": clean_sql, "sql_file": sql_file}
+            result = {"status": "success", "sql": clean_sql}
 
             if execute:
                 try:
                     result_df = self.execute_sql(db_engine, clean_sql)
-                    if result_df is not None:
-                        result_file = os.path.join(output_dir, 'query_result.csv')
-                        result_df.to_csv(result_file, index=False, encoding='utf-8-sig')
-                        result["result_file"] = result_file
-                        result["result"] = "See CSV file for full results"
+                    # 直接使用字符串结果
+                    result["sql"]= clean_sql
+                    result["answer"] = result_df
+                    return result
                 except Exception as e:
                     result["status"] = "partial_success"
                     result["error"] = str(e)
