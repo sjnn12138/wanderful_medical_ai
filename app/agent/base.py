@@ -150,7 +150,7 @@ class BaseAgent(BaseModel, ABC):
                 results.append(f"Terminated: Reached max steps ({self.max_steps})")
 
         # Summarization logic
-        summary_prompt = "请根据以上的对话历史，总结整个过程，并用中文向用户汇报最终结果。请确保你的回答是直接的、清晰的，并且只包含最终的结论和成果，不要复述中间的步骤。"
+        summary_prompt = "请根据以上的对话历史，总结整个过程，并用中文向用户汇报最终结果。结果必须详实，请你仔细阅读全部的中间过程，结合用户的问题将和问题有关的所有回答都组织起来返回给用户，如果有网页查询操作就将相关页面地址一起返回"
         
         summary_messages = self.memory.messages + [Message.user_message(summary_prompt)]
 

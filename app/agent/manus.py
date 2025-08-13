@@ -13,11 +13,11 @@ from app.tool.browser_use_tool import BrowserUseTool
 from app.tool.mcp import MCPClients, MCPClientTool
 from app.tool.python_execute import PythonExecute
 from app.tool.str_replace_editor import StrReplaceEditor
-from app.tool.excel_to_sqlite import ExcelToSQLiteTool
+# from app.tool.excel_to_sqlite import ExcelToSQLiteTool
 from app.tool.ingest_tool import IngestTool
 from app.tool.query_tool import QueryTool
 from app.tool.text_to_sql_tool import TextToSQLTool
-from app.tool.generate_mschema_tool import GenerateMSchemaTool
+# from app.tool.generate_mschema_tool import GenerateMSchemaTool
 from app.tool.query_decomposer import QueryDecomposer  # 新增查询分解工具
 
 class Manus(ToolCallAgent):
@@ -40,7 +40,7 @@ class Manus(ToolCallAgent):
         default_factory=lambda: ToolCollection(
             PythonExecute(),
             BrowserUseTool(),
-            # StrReplaceEditor(),
+            StrReplaceEditor(),
             # AskHuman(),
             # ExcelToSQLiteTool(),
             # IngestTool(),
