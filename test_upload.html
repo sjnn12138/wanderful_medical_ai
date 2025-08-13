@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test File Upload</title>
+</head>
+<body>
+    <h1>Test File Upload</h1>
+    
+    <input type="file" id="fileInput" multiple>
+    <button onclick="uploadFiles()">Upload Files</button>
+    
+    <div id="result"></div>
+
+    <script>
+        async function uploadFiles() {
+            const fileInput = document.getElementById('fileInput');
+            const files = fileInput.files;
+            
+            if (files.length === 0) {
+                document.getElementById('result').innerText = 'No files selected';
+                return;
+            }
+            
+            const filePaths = Array.from(files).map(file => file.name);
+            
+            try {
+                const response = await fetch('http://localhost:5000/process_files', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ filePaths })
+                });
+                
+                const data = await response.json();
+                document.getElementById('result').innerText = 
+                    data.success 
+                    ? 'Files processed successfully! Check MSchema directory.' 
+                    : 'Error: ' + data.message;
+            } catch (error) {
+                document.getElementById('result').innerText = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

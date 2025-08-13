@@ -1,40 +1,48 @@
 import os
+import sys
+import argparse
 from sqlalchemy import create_engine
+
+# Add project root to Python path
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
 from MSchema.schema_engine import SchemaEngine
-from pydantic import Field, BaseModel
-from typing import Type
 
-from app.tool.base import BaseTool
+if __name__ == "__main__":
+    # Set up command-line argument parser
+    parser = argparse.ArgumentParser(description='Generate M-Schema from SQLite database')
+    parser.add_argument('--db', required=True, help='Path to SQLite database file')
+    parser.add_argument('--output', required=True, help='Output file path for M-Schema JSON')
+    args = parser.parse_args()
 
-class GenerateMSchemaToolInput(BaseModel):
-    db_path: str = Field(..., description="Path to SQLite database file")
-    output_dir: str = Field(default='./output', description="Output directory for M-Schema file")
-
-class GenerateMSchemaTool(BaseTool):
-
-    name: str = "GenerateMSchema"
-    name: str = "GenerateMSchema"
-    description: str = (
-        "Converts a SQLite database file into M-Schema JSON format. "
-        "The output JSON file is saved in the same directory as the input database file, "
-        "with the same base filename but with a '.json' extension. "
-        "For example, 'data/jixiao.sqlite' will generate 'data/jixiao.json'. "
-        "Useful for creating structured schema representations for text-to-SQL tasks."
-    )
-    args_schema: Type[BaseModel] = GenerateMSchemaToolInput
-
-    async def execute(self, db_path: str , output_dir: str) -> dict:
-        """Generate M-Schema from SQLite database"""
-        abs_path = os.path.abspath(db_path)
+    try:
+        # Get absolute path to database
+        abs_path = os.path.abspath(args.db)
         if not os.path.exists(abs_path):
-            return {"status": "error", "message": f"Database file not found: {abs_path}"}
+            print(f"Error: Database file not found: {abs_path}")
+            exit(1)
 
+        # Create database engine
         db_engine = create_engine(f'sqlite:///{abs_path}')
-        schema_engine = SchemaEngine(engine=db_engine, db_name='jixiao')
+
+        # Create schema engine - use filename without extension as db_name
+        db_name = os.path.splitext(os.path.basename(abs_path))[0]
+        schema_engine = SchemaEngine(engine=db_engine, db_name=db_name)
+
+        # Generate M-Schema
         mschema = schema_engine.mschema
 
-        os.makedirs(output_dir, exist_ok=True)
-        output_file = os.path.join(output_dir, '2023-06科室绩效科室数据.json')
-        mschema.save(output_file)
+        # Ensure output directory exists
+        output_dir = os.path.dirname(args.output)
+        if output_dir:
+            os.makedirs(output_dir, exist_ok=True)
 
-        return {"status": "success", "output_file": output_file}
+        # Save M-Schema
+        mschema.save(args.output)
+        print(f"Successfully generated M-Schema at '{args.output}'")
+
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        exit(1)
