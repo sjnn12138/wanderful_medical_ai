@@ -303,6 +303,40 @@
             border-top: 1px solid rgba(255,255,255,0.1);
         }
 
+        /* 对话模式按钮 */
+        .mode-buttons {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .mode-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: var(--content-light);
+            color: var(--text-gray);
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+
+        .mode-btn:hover {
+            background: #4a4b5a;
+        }
+
+        .mode-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .mode-btn i {
+            font-size: 14px;
+        }
+
         .input-box {
             position: relative;
             display: flex;
@@ -626,6 +660,11 @@
             .upload-container {
                 flex-direction: column;
             }
+
+            .mode-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
         }
 
         /* 滚动条样式 */
@@ -776,6 +815,16 @@
             </div>
 
             <div class="input-container">
+                <!-- 新增的对话模式按钮 -->
+                <div class="mode-buttons">
+                    <button class="mode-btn" id="deepThinkingBtn">
+                        <i class="fas fa-brain"></i> 深度思考
+                    </button>
+                    <button class="mode-btn" id="localKnowledgeBtn">
+                        <i class="fas fa-book"></i> 本地知识库
+                    </button>
+                </div>
+
                 <div class="input-box">
                     <input type="text" placeholder="输入行政指令或问题..." id="messageInput">
                     <button id="sendMessage"><i class="fas fa-paper-plane"></i></button>
@@ -926,6 +975,10 @@
         const tableFilesList = document.getElementById('tableFilesList');
         const docFilesList = document.getElementById('docFilesList');
         const processBtn = document.getElementById('processKnowledge');
+
+        // 对话模式按钮
+        const deepThinkingBtn = document.getElementById('deepThinkingBtn');
+        const localKnowledgeBtn = document.getElementById('localKnowledgeBtn');
 
         // 科室导航与功能栏切换
         function showFunctionSidebar() {
@@ -1113,14 +1166,52 @@
                 setTimeout(() => {
                     const aiMessage = document.createElement('div');
                     aiMessage.className = 'message ai-message';
+
+                    // 根据当前模式生成不同回复
+                    let responseContent = '';
+                    if (deepThinkingBtn.classList.contains('active')) {
+                        responseContent = `
+                            <div class="message-content">
+                                <strong>【深度思考模式】</strong><br>
+                                收到您的指令: "${message}"。正在进行深入分析：
+                                <ol>
+                                    <li>正在分析问题背景和上下文关系</li>
+                                    <li>检索医院历史数据和相关案例</li>
+                                    <li>评估多种解决方案的可行性</li>
+                                    <li>考虑长期影响和潜在风险</li>
+                                </ol>
+                                预计需要30秒完成深度分析，请稍候...
+                            </div>
+                        `;
+                    } else if (localKnowledgeBtn.classList.contains('active')) {
+                        responseContent = `
+                            <div class="message-content">
+                                <strong>【本地知识库模式】</strong><br>
+                                收到您的指令: "${message}"。正在检索本地知识库：
+                                <ul>
+                                    <li>已匹配医院政策文件3份</li>
+                                    <li>找到相关运营报告2份</li>
+                                    <li>检索到类似案例5个</li>
+                                    <li>提取最佳实践方案</li>
+                                </ul>
+                                正在整合知识库内容生成回复...
+                            </div>
+                        `;
+                    } else {
+                        responseContent = `
+                            <div class="message-content">
+                                收到您的指令: "${message}"。正在分析相关数据，请稍候...
+                            </div>
+                        `;
+                    }
+
                     aiMessage.innerHTML = `
                         <div class="message-header">
                             <i class="fas fa-robot"></i> 医院行政助手
                         </div>
-                        <div class="message-content">
-                            收到您的指令: "${message}"。正在分析相关数据，请稍候...
-                        </div>
+                        ${responseContent}
                     `;
+
                     messagesContainer.appendChild(aiMessage);
 
                     // 滚动到底部
@@ -1128,6 +1219,23 @@
                 }, 1000);
             }
         }
+
+        // 对话模式按钮切换
+        deepThinkingBtn.addEventListener('click', function() {
+            this.classList.toggle('active');
+            // 确保本地知识库按钮状态同步
+            if (localKnowledgeBtn.classList.contains('active')) {
+                localKnowledgeBtn.classList.remove('active');
+            }
+        });
+
+        localKnowledgeBtn.addEventListener('click', function() {
+            this.classList.toggle('active');
+            // 确保深度思考按钮状态同步
+            if (deepThinkingBtn.classList.contains('active')) {
+                deepThinkingBtn.classList.remove('active');
+            }
+        });
 
         // 移动端菜单切换
         menuToggle.addEventListener('click', () => {
