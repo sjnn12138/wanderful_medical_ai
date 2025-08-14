@@ -10,6 +10,8 @@ from app.prompt.manus import NEXT_STEP_PROMPT, SYSTEM_PROMPT
 from app.tool import Terminate, ToolCollection
 from app.tool.ask_human import AskHuman
 from app.tool.browser_use_tool import BrowserUseTool
+from app.tool.excel_to_sqlite_tool import ExcelToSQLiteTool
+from app.tool.generate_mschema import GenerateMSchemaTool
 from app.tool.mcp import MCPClients, MCPClientTool
 from app.tool.python_execute import PythonExecute
 from app.tool.str_replace_editor import StrReplaceEditor
@@ -42,13 +44,13 @@ class Manus(ToolCallAgent):
             BrowserUseTool(),
             StrReplaceEditor(),
             # AskHuman(),
-            # ExcelToSQLiteTool(),
-            # IngestTool(),
+            ExcelToSQLiteTool(),
+            IngestTool(),
             # QueryTool(),
             # QueryDecomposer(),  # 新增查询分解工具
             Terminate(),
             # TextToSQLTool(),
-            # GenerateMSchemaTool()
+            GenerateMSchemaTool()
         )
     )
 

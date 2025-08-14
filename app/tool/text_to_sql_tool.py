@@ -42,8 +42,9 @@ class TextToSQLTool(BaseTool):
         except Exception as e:
             return f"SQL execution error: {str(e)}"
 
-    async def execute(self, question: str, db_path: str = './workspace/2023-06科室绩效科室数据.sqlite', mschema_path: str = './workspace/2023-06科室绩效科室数据.json',
+    async def execute(self, question: str, db_path: str = 'D:\\python_CODE\\wanderful_medical_ai\\workspace\\2023-06科室绩效科室数据.sqlite', mschema_path: str = 'D:\\python_CODE\\wanderful_medical_ai\\workspace\\2023-06科室绩效科室数据.json',
                    output_dir: str = './workspace', execute: bool = True) -> dict:
+        print("begin  zhuanhuan")
         """Convert natural language question to SQL and execute"""
         abs_db_path = os.path.abspath(db_path)
         if not os.path.exists(abs_db_path):
@@ -75,9 +76,9 @@ Wrap SQL in ```sql and ```.
 
         client = OpenAI(
             base_url='https://api-inference.modelscope.cn/v1',
-            api_key='',
+            api_key='ms-eb9b87d5-e78e-48cb-9de4-c5c6b1bdbb01',
         )
-
+        print(prompt)
         try:
             response = client.chat.completions.create(
                 model='XGenerationLab/XiYanSQL-QwenCoder-32B-2504',
@@ -89,6 +90,7 @@ Wrap SQL in ```sql and ```.
             )
 
             sql_content = response.choices[0].message.content
+            print("111"+sql_content)
             clean_sql = sql_content.replace('```sql', '').replace('```', '').replace(';', '').strip()+";"
 
             result = {"status": "success", "sql": clean_sql}

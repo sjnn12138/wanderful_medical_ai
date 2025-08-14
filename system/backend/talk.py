@@ -55,20 +55,68 @@ def chat():
         'response': response
     })
 
+from flask import request, jsonify
+from werkzeug.utils import secure_filename
+import os
+import time
+
 
 @app.route('/api/knowledge', methods=['POST'])
 def upload_knowledge():
-    """处理知识库上传的API（模拟）"""
-    # 在实际应用中，这里会处理文件上传和存储
-    # 这里我们只模拟处理过程
+    """接收并处理上传的文件"""
 
-    # 模拟处理延迟
-    time.sleep(2)
+    # 获取文件列表
+    table_files = request.files.getlist('tableFiles')
+    doc_files = request.files.getlist('docFiles')
+
+    if len(table_files) == 0 and len(doc_files) == 0:
+        return jsonify({
+            'status': 'error',
+            'message': '没有接收到任何文件。'
+        }), 400
+
+    # 创建保存目录（可选）
+    upload_folder = './uploads'
+    os.makedirs(upload_folder, exist_ok=True)
+
+    saved_files = []
+
+    # 处理表格文件
+    for file in table_files:
+        if file and file.filename != '':
+            filename = secure_filename(file.filename)
+            path = os.path.join(upload_folder, 'table_' + filename)
+            file.save(path)
+            saved_files.append(path)
+
+    # 处理文档文件
+    for file in doc_files:
+        if file and file.filename != '':
+            filename = secure_filename(file.filename)
+            path = os.path.join(upload_folder, 'doc_' + filename)
+            file.save(path)
+            saved_files.append(path)
+
 
     return jsonify({
         'status': 'success',
-        'message': '知识库创建成功！系统已成功处理所有上传的文件。'
+        'message': f'知识库创建成功！共处理 {len(saved_files)} 个文件。',
+        'processed_files': saved_files  # 可选：返回处理的文件路径
     })
+
+# @app.route('/api/knowledge', methods=['POST'])
+# def upload_knowledge():
+#     """处理知识库上传的API（模拟）"""
+#     # 在实际应用中，这里会处理文件上传和存储
+#     # 这里我们只模拟处理过程
+#
+#     # 模拟处理延迟
+#     time.sleep(2)
+#
+#     return jsonify({
+#         'status': 'success',
+#         'message': '知识库创建成功！系统已成功处理所有上传的文件。'
+#     })
 
 
 # def generate_response(message, mode):

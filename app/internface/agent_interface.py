@@ -65,6 +65,7 @@ async def execute_query(model: int, prompt: str):
                   sql_tool = TextToSQLTool()
                   logger.info(f"正在使用TextToSQLTool查询子问题: {db_response}")
                   sql_query_result = await sql_tool.execute(question=db_response)
+                  print("11111"+str(sql_query_result))
                   sql_result = sql_query_result["answer"]
                   sql = sql_query_result["sql"]
 

@@ -78,5 +78,4 @@ def process_files():
 
 if __name__ == '__main__':
     # Create MSchema directory if it doesn't exist
-    os.makedirs('MSchema', exist_ok=True)
     app.run(host='0.0.0.0', port=5000, debug=True)
