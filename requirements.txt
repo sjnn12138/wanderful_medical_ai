@@ -43,3 +43,5 @@ setuptools~=75.8.0
 chromadb
 llama-index
 sqlalchemy
+flask
+flask_cors
